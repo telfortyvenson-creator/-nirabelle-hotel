@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(RECEPTIONIST)
+  createdAt DateTime @default(now())
+}
+
+model Chambre {
+  id          String        @id @default(cuid())
+  numero      String        @unique
+  type        TypeChambre
+  nom         String
+  description String
+  prix        Float
+  capacite    Int
+  superficie  Float?
+  etage       Int           @default(1)
+  statut      StatutChambre @default(DISPONIBLE)
+  images      String[]
+  equipements String[]
+  createdAt   DateTime      @default(now())
+  reservations Reservation[]
+}
+
+model Client {
+  id          String        @id @default(cuid())
+  nom         String
+  prenom      String
+  email       String        @unique
+  telephone   String?
+  nationalite String?
+  pieceId     String?
+  createdAt   DateTime      @default(now())
+  reservations Reservation[]
+}
+
+model Reservation {
+  id           String            @id @default(cuid())
+  chambreId    String
+  clientId     String
+  dateArrivee  DateTime
+  dateDepart   DateTime
+  nbPersonnes  Int               @default(1)
+  statut       StatutReservation @default(EN_ATTENTE)
+  source       SourceReservation @default(EN_LIGNE)
+  montantTotal Float
+  montantPaye  Float             @default(0)
+  stripeId     String?
+  notes        String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  chambre      Chambre           @relation(fields: [chambreId], references: [id])
+  client       Client            @relation(fields: [clientId], references: [id])
+  paiements    Paiement[]
+}
+
+model Paiement {
+  id            String      @id @default(cuid())
+  reservationId String
+  montant       Float
+  methode       Methode
+  reference     String?
+  createdAt     DateTime    @default(now())
+  reservation   Reservation @relation(fields: [reservationId], references: [id])
+}
+
+// Paramètres clé-valeur (hero image, infos hôtel, etc.)
+model Parametre {
+  id        String   @id @default(cuid())
+  cle       String   @unique
+  valeur    String
+  updatedAt DateTime @updatedAt
+}
+
+// Photos galerie
+model GaleriePhoto {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String   @default("")
+  categorie String   @default("Hôtel")
+  ordre     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  RECEPTIONIST
+}
+
+enum TypeChambre {
+  STANDARD
+  DELUXE
+  SUITE
+  SUITE_PRESIDENTIELLE
+}
+
+enum StatutChambre {
+  DISPONIBLE
+  OCCUPEE
+  MAINTENANCE
+  HORS_SERVICE
+}
+
+enum StatutReservation {
+  EN_ATTENTE
+  CONFIRMEE
+  CHECKIN
+  CHECKOUT
+  ANNULEE
+}
+
+enum SourceReservation {
+  EN_LIGNE
+  SUR_PLACE
+  TELEPHONE
+}
+
+enum Methode {
+  STRIPE
+  CASH
+  VIREMENT
+  MONCASH
+}
