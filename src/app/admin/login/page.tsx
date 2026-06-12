@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock } from "lucide-react";
+import Link from "next/link";
+import { Eye, EyeOff, Lock, ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -36,6 +37,14 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-[#0f2340] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
+        {/* Lien retour au site vitrine */}
+        <div className="mb-5">
+          <Link href="/" className="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm transition-colors">
+            <ArrowLeft size={15} />
+            Retour au site
+          </Link>
+        </div>
+
         <div className="text-center mb-8">
           <div className="text-white font-bold text-3xl tracking-wide">NIRABELLE</div>
           <div className="text-[#c9a84c] text-sm tracking-widest mb-2">HÔTEL & POOL</div>
